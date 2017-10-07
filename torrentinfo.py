@@ -31,7 +31,6 @@ def nyaa_info(bot, trigger):
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
         return bot.say("[Nyaa] HTTP error: " + e.message)
-        #return bot.say("[Nyaa] Torrent not found!")
 
     page = etree.HTML(r.content)
     pq = PyQuery(page)
@@ -46,7 +45,7 @@ def nyaa_info(bot, trigger):
     t['size'] = t['size'].text()
     t['uploader'] = t['uploader'].text()
 
-    bot.say("[Nyaa] Name: {name} | Size: {size} | Uploaded by: {uploader} | {link}".format(name=t['name'], size=t['size'], uploader=t['uploader'], link=t['link']))
+    bot.say("[Nyaa] Name: {name} | Size: {size} | Uploaded by: {uploader} | {link}".format(**t))
 
 @module.rule('.*https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+).*')
 def anidex_info(bot, trigger):
@@ -77,5 +76,5 @@ def anidex_info(bot, trigger):
     t['size'] = t['size'].text()
     t['uploader'] = t['uploader'].text()
 
-    bot.say("[Anidex] Name: {name} | Size: {size} | Uploaded by: {uploader} | {link}".format(name=t['name'], size=t['size'], uploader=t['uploader'], link=t['link']))
+    bot.say("[Anidex] Name: {name} | Size: {size} | Uploaded by: {uploader} | {link}".format(**t))
 
