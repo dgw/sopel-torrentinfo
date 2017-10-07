@@ -18,25 +18,20 @@ NYAA_URL = 'https://nyaa.si/view/%s'
 ANIDEX_URL = 'https://anidex.info/torrent/%s'
 
 @module.rule('.*https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+).*')
-#@module.rule('.*https?:\/\/(?:www\.)?nyaa.(?:se|eu)\/\S*(?:\?|&)tid=(\d+).*')
 def nyaa_info(bot, trigger):
     try:
         r = requests.get(url=NYAA_URL % trigger.group(1), timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
-        #bot.say("Connection timed out.")
-        return
+        returnbot.say("Connection timed out.")
     except requests.exceptions.ConnectionError:
-        #bot.say("Couldn't connect to server.")
-        return
+        return bot.say("Couldn't connect to server.")
     except requests.exceptions.ReadTimeout:
-        #bot.say("Server took too long to send data.")
-        return
+        return bot.say("Server took too long to send data.")
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        #bot.say("HTTP error: " + e.message)
-        bot.msg('#katou-test', 'Nyaa resolving failed for URL: '+NYAA_URL % trigger.group(1)+' at channel '+trigger.sender+' triggered by '+trigger.nick)
-        return bot.say("[Nyaa] Torrent not found!")
+        return bot.say("[Nyaa] HTTP error: " + e.message)
+        #return bot.say("[Nyaa] Torrent not found!")
 
     page = etree.HTML(r.content)
     pq = PyQuery(page)
@@ -58,20 +53,15 @@ def anidex_info(bot, trigger):
     try:
         r = requests.get(url=ANIDEX_URL % trigger.group(1), timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
-        bot.say("[Anidex] Connection timed out.")
-        return
+        return bot.say("[Anidex] Connection timed out.")
     except requests.exceptions.ConnectionError:
-        bot.say("[Anidex] Couldn't connect to server.")
-        return
+        return bot.say("[Anidex] Couldn't connect to server.")
     except requests.exceptions.ReadTimeout:
-        bot.say("[Anidex] Server took too long to send data.")
-        return
+        return bot.say("[Anidex] Server took too long to send data.")
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        #bot.say("HTTP error: " + e.message)
-        bot.msg('#katou-test', 'Anidex resolving failed for URL: '+NYAA_URL % trigger.group(1)+' at channel '+trigger.sender+' triggered by '+trigger.nick)
-        return bot.say("[Anidex] Torrent not found!")
+        return bot.say("[Anidex] HTTP error: " + e.message)
 
     page = etree.HTML(r.content)
     pq = PyQuery(page)
