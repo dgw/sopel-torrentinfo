@@ -19,8 +19,9 @@ ANIDEX_URL = 'https://anidex.info/torrent/%s'
 
 @module.rule('.*https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+).*')
 def nyaa_info(bot, trigger):
+    parsed_url = NYAA_URL % trigger.group(1)
     try:
-        r = requests.get(url=NYAA_URL % trigger.group(1), timeout=(10.0, 4.0))
+        r = requests.get(url=parsed_url, timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
         returnbot.say("Connection timed out.")
     except requests.exceptions.ConnectionError:
@@ -40,7 +41,7 @@ def nyaa_info(bot, trigger):
     t['name'] = pq('body > div > div:nth-child(1) > div.panel-heading > h3')
     t['size'] = pq('body > div > div:nth-child(1) > div.panel-body > div:nth-child(4) > div:nth-child(2)')
     t['uploader'] = pq('body > div > div:nth-child(1) > div.panel-body > div:nth-child(2) > div:nth-child(2) > a')
-    t['link'] = NYAA_URL % trigger.group(1)
+    t['link'] = parsed_url
     t['name'] = t['name'].text()
     t['size'] = t['size'].text()
     t['uploader'] = t['uploader'].text()
@@ -49,8 +50,9 @@ def nyaa_info(bot, trigger):
 
 @module.rule('.*https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+).*')
 def anidex_info(bot, trigger):
+    parsed_url = ANIDEX_URL % trigger.group(1)
     try:
-        r = requests.get(url=ANIDEX_URL % trigger.group(1), timeout=(10.0, 4.0))
+        r = requests.get(url=parsed_url, timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
         return bot.say("[Anidex] Connection timed out.")
     except requests.exceptions.ConnectionError:
