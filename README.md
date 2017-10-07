@@ -11,6 +11,7 @@ other supported sites) will come later.
 The torrentinfo module relies on the following Python components:
 
 * `bleach`
+* `cssselect`
 * `etree` from `lxml`
 * `requests`
 
