@@ -5,6 +5,7 @@ torrentinfo.py - Sopel module to fetch torrent information for links sent to cha
 from sopel import module
 import requests
 import lxml
+from lxml import etree
 import re
 import bleach
 
