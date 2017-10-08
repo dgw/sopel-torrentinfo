@@ -32,9 +32,9 @@ def nyaa_info(bot, trigger):
     t = {}
 
     t['name'] = page.cssselect('meta[property="og:title"]')[0].get('content').replace(' :: Nyaa', '').encode('utf-8')
-    t['category'] = str(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 1)[0]).encode('utf-8')
-    t['size'] = str(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 2)[1]).encode('utf-8')
-    t['uploader'] = str(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2]).encode('utf-8')
+    t['category'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 1)[0]
+    t['size'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 2)[1]
+    t['uploader'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2]
     t['link'] = parsed_url
 
     bot.say("[Nyaa] Name: {name} | {category}| Size:{size}|{uploader} | {link}".format(**t))
