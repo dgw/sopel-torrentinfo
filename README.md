@@ -10,12 +10,10 @@ other supported sites) will come later.
 ## Requirements
 The torrentinfo module relies on the following Python components:
 
-* `etree` from `lxml`
+* `lxml`
 * `requests`
+* `bleach`
 
 ## Usage
 There are no commands. Just enable the module and it will fetch info about
 supported torrents automatically.
-
-## Known issues
-If the uploader on Nyaa.si is Anonymous, it will just show empty space.
