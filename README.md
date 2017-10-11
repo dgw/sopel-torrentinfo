@@ -3,8 +3,8 @@ Sopel module that fetches info about torrent links
 
 ## Current status
 
-The current support is very limited, just a proof of doing something. It fetches
-only from Nyaa.si and Anidex.info, and then only a very few details. 
+The current support is very limited, just a proof of doing something. 
+It fetches only from Nyaa.si and Anidex.info, and then only a very few details. 
 More information (and possibly other supported sites) will come later.
 
 ## Requirements
