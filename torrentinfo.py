@@ -11,6 +11,7 @@ import re
 NYAA_URL = 'https://nyaa.si/view/%s'
 ANIDEX_URL = 'https://anidex.info/torrent/%s'
 
+
 @module.rule('.*https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+).*')
 def nyaa_info(bot, trigger):
     parsed_url = NYAA_URL % trigger.group(1)
@@ -38,6 +39,7 @@ def nyaa_info(bot, trigger):
 
     # Lack of spaces is neccessary to avoid double spacing.
     bot.say("[Nyaa] Name: {name} | {category}| Size:{size}|{uploader} | {link}".format(**t))
+
 
 @module.rule('.*https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+).*')
 def anidex_info(bot, trigger):
