@@ -10,10 +10,10 @@ More information (and possibly other supported sites) will come later.
 ## Requirements
 The torrentinfo module relies on the following Python components:
 
+* `bleach`
+* `cssselect`
 * `lxml`
 * `requests`
-* `bleach`
-* `csselect`
 
 ## Usage
 There are no commands. Just enable the module and it will fetch info about
