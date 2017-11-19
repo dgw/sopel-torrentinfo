@@ -40,7 +40,7 @@ def nyaa_info(bot, trigger):
     t['link'] = parsed_url
     for key in t.keys():
         t[key] = (' '.join(t[key].split())).encode('utf-8')
-    bot.say("[Nyaa] Name: {name} | {category} | Size: {size} | {uploader} | {link}".format(**t))
+    bot.say("[Nyaa] Name: {name} | {category} | Size: {size} | {uploader}".format(**t))
 
 
 @module.rule('.*https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+).*')
@@ -72,4 +72,4 @@ def anidex_info(bot, trigger):
     t['link'] = parsed_url
     t['name'] = re.sub(r'\ \+(\d)+', '', t['name'])
 
-    bot.say("[Anidex] Name: {name} | Size: {size} | Uploaded by: {uploader} | {link}".format(**t))
+    bot.say("[Anidex] Name: {name} | Size: {size} | Uploaded by: {uploader}".format(**t))
