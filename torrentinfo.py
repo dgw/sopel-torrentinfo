@@ -3,10 +3,11 @@ torrentinfo.py - Sopel module to fetch torrent information for links sent to cha
 """
 
 from sopel import module
-import bleach
 import requests
+import lxml
 from lxml import etree
 import re
+import bleach
 
 NYAA_URL = 'https://nyaa.si/view/%s'
 ANIDEX_URL = 'https://anidex.info/torrent/%s'
@@ -31,14 +32,15 @@ def nyaa_info(bot, trigger):
     page = etree.HTML(r.content)
 
     t = {}
-    t['name'] = page.cssselect('meta[property="og:title"]')[0].get('content').replace(' :: Nyaa', '').encode('utf-8')
+
+    t['name'] = page.cssselect('meta[property="og:title"]')[0].get('content').replace(' :: Nyaa', '')
     t['category'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 1)[0]
     t['size'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 2)[1]
     t['uploader'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2]
     t['link'] = parsed_url
-
-    # Lack of spaces is neccessary to avoid double spacing.
-    bot.say("[Nyaa] Name: {name} | {category}| Size:{size}|{uploader} | {link}".format(**t))
+    for key in t.keys():
+        t[key] = (' '.join(t[key].split())).encode('utf-8')
+    bot.say("[Nyaa] Name: {name} | {category} | Size: {size} | {uploader} | {link}".format(**t))
 
 
 @module.rule('.*https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+).*')
@@ -60,13 +62,14 @@ def anidex_info(bot, trigger):
     page = etree.HTML(r.content)
 
     t = {}
+
     t['name'] = page.cssselect('#content > div.panel.panel-default > div > h3')[0]
     t['size'] = page.cssselect('#scrape_info_table > tbody > tr:nth-child(2) > td')[0]
     t['uploader'] = page.cssselect('#edit_torrent_form > div.row > div:nth-child(1) > table:nth-child(1) > tbody > tr:nth-child(1) > td > a')[0]
     for key in t.keys():
-        t[key] = bleach.clean(etree.tostring(t[key]), tags=[], strip=True)
+        t[key] = ' '.join((bleach.clean(etree.tostring(
+            t[key]), tags=[], strip=True).encode('utf-8')).split())
     t['link'] = parsed_url
     t['name'] = re.sub(r'\ \+(\d)+', '', t['name'])
 
-    # Lack of spaces is neccessary to avoid double spacing.
-    bot.say("[Anidex] Name:{name}| Size:{size}| Uploaded by: {uploader} | {link}".format(**t)) 
+    bot.say("[Anidex] Name: {name} | Size: {size} | Uploaded by: {uploader} | {link}".format(**t))
