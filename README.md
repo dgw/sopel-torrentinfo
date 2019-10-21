@@ -15,6 +15,8 @@ The torrentinfo module relies on the following Python components:
 * `etree` from `lxml`
 * `requests`
 
+Only tested on Python 3, due to Python 2 reaching EOL on January 1, 2020.
+
 ## Usage
 There are no commands. Just enable the module and it will fetch info about
 supported torrents automatically.

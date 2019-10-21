@@ -1,12 +1,16 @@
+# coding=utf-8
 """
 torrentinfo.py - Sopel module to fetch torrent information for links sent to channels
 """
 
-from sopel import module
+import re
+
 import bleach
 import requests
 from lxml import etree
-import re
+
+from sopel import module, web
+
 
 NYAA_URL = 'https://nyaa.si/view/%s'
 ANIDEX_URL = 'https://anidex.info/torrent/%s'
@@ -38,7 +42,7 @@ def nyaa_info(bot, trigger):
     t['uploader'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2]
     t['link'] = parsed_url
     for key in t.keys():
-        t[key] = (' '.join(t[key].split())).encode('utf-8')
+        t[key] = (' '.join(t[key].split()))
     bot.say("[Nyaa] Name: {name} | {category} | Size: {size} | {uploader}".format(**t))
 
 
@@ -66,8 +70,10 @@ def anidex_info(bot, trigger):
     t['size'] = page.cssselect('#scrape_info_table > tbody > tr:nth-child(2) > td')[0]
     t['uploader'] = page.cssselect('#edit_torrent_form > div.row > div:nth-child(1) > table:nth-child(1) > tbody > tr:nth-child(1) > td > a')[0]
     for key in t.keys():
-        t[key] = ' '.join((bleach.clean(etree.tostring(
-            t[key]), tags=[], strip=True).encode('utf-8')).split())
+        t[key] = web.decode(' '.join((bleach.clean(etree.tostring(
+            t[key],
+            encoding='utf-8').decode('utf-8'),
+            tags=[], strip=True)).split())).strip()
     t['link'] = parsed_url
     t['name'] = re.sub(r'\ \+(\d)+', '', t['name'])
 
