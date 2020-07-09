@@ -30,7 +30,7 @@ def nyaa_info(bot, trigger):
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        return bot.say("[Nyaa] HTTP error: " + e.message)
+        return bot.say("[Nyaa] HTTP error: " + str(e))
 
     page = etree.HTML(r.content)
 
@@ -60,7 +60,7 @@ def anidex_info(bot, trigger):
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        return bot.say("[Anidex] HTTP error: " + e.message)
+        return bot.say("[Anidex] HTTP error: " + str(e))
 
     page = etree.HTML(r.content)
 
