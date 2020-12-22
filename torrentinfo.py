@@ -18,7 +18,7 @@ ANIDEX_URL = 'https://anidex.info/torrent/%s'
 
 @module.url(r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)')
 def nyaa_info(bot, trigger, match=None):
-    parsed_url = NYAA_URL % trigger.group(1)
+    parsed_url = NYAA_URL % match.group(1)
     try:
         r = requests.get(url=parsed_url, timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
@@ -48,7 +48,7 @@ def nyaa_info(bot, trigger, match=None):
 
 @module.url(r'https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+)')
 def anidex_info(bot, trigger, match=None):
-    parsed_url = ANIDEX_URL % trigger.group(1)
+    parsed_url = ANIDEX_URL % match.group(1)
     try:
         r = requests.get(url=parsed_url, timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
