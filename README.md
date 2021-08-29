@@ -1,14 +1,16 @@
 # sopel-torrentinfo
-Sopel module that fetches info about torrent links
+
+Sopel plugin to fetch info for torrent links.
 
 ## Current status
 
-The current support is very limited, just a proof of doing something. It fetches
-only from Nyaa.si and Anidex.info, and then only a very few details. More
-information (and possibly other supported sites) will come later.
+The current support is very limited, just a proof of doing something. It
+fetches only from Nyaa.si and Anidex.info, and then only a very few details.
+More information (and possibly other supported sites) will come later.
 
 ## Requirements
-The torrentinfo module relies on the following Python components:
+
+The `torrentinfo` plugin relies on Sopel 7.1+ and the following PyPI packages:
 
 * `bleach`
 * `cssselect`
@@ -18,5 +20,6 @@ The torrentinfo module relies on the following Python components:
 Only tested on Python 3, due to Python 2 reaching EOL on January 1, 2020.
 
 ## Usage
-There are no commands. Just enable the module and it will fetch info about
-supported torrents automatically.
+
+There are no commands. Just enable the plugin and it will fetch info about
+supported torrents automatically when links appear in chat.
