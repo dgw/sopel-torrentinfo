@@ -19,8 +19,9 @@ def setup(bot):
     patterns = []
 
     for entry_point in entry_points:
-        provider = bot.memory['torrentinfo_providers'][entry_point.name] = entry_point.load()
-        patterns.append(provider.link_pattern())
+        provider = entry_point.load()
+        bot.memory['torrentinfo_providers'][entry_point.name] = provider = provider()
+        patterns.append(provider.get_url_pattern())
 
 
 def lazy_handlers(settings):
@@ -30,10 +31,10 @@ def lazy_handlers(settings):
 @plugin.url_lazy(lazy_handlers)
 def torrent_info(bot, trigger):
     for name, provider in bot.memory['torrentinfo_providers'].items():
-        if provider.link_pattern().match(trigger.group(0)):
+        if provider.get_url_pattern().match(trigger.group(0)):
             break
 
-    display_name = provider.display_name()
+    display_name = provider.DISPLAY_NAME
     fetch_url = provider.get_fetch_url(trigger)
 
     try:

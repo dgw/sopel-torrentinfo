@@ -11,27 +11,29 @@ from lxml import etree
 class TorrentInfoProvider(abc.ABC):
     """Base class for torrent link info providers."""
 
-    @staticmethod
+    @property
     @abc.abstractmethod
-    def link_pattern():
-        """Must return a compiled regex pattern matching links this provider can handle."""
+    def URL_PATTERN(self):
+        """Required URL pattern, as it would be passed to ``@plugin.url`` decorator."""
 
-    @classmethod
-    def display_name(cls):
+    def get_url_pattern(self):
+        """Compile and return the URL pattern for Sopel's rule manager."""
+        return re.compile(self.URL_PATTERN)
+
+    @property
+    def DISPLAY_NAME(self):
         """Define a human-readable name for this provider.
 
         For example, ``Nyaa`` or ``TokyoTosho``.
 
         If not overridden, will return the class's ``__name__``.
         """
-        return cls.__name__
+        return self.__class__.__name__
 
-    @staticmethod
     @abc.abstractmethod
-    def get_fetch_url(trigger):
+    def get_fetch_url(self, trigger):
         """Return the URL to fetch, given a matching URL ``trigger``."""
 
-    @staticmethod
     @abc.abstractmethod
     def parse(response):
         """Parse the fetched ``response`` data.
@@ -56,16 +58,12 @@ class TorrentInfoProvider(abc.ABC):
 class Nyaa(TorrentInfoProvider):
     """Handler for Nyaa.si links."""
 
-    @staticmethod
-    def link_pattern():
-        return re.compile(r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)')
+    URL_PATTERN = r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)'
 
-    @staticmethod
-    def get_fetch_url(trigger):
+    def get_fetch_url(self, trigger):
         return 'https://nyaa.si/view/%s' % trigger.group(1)
 
-    @staticmethod
-    def parse(response):
+    def parse(self, response):
         page = etree.HTML(response.content)
 
         t = []
