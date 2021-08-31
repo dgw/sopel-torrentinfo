@@ -1,22 +1,23 @@
 # coding=utf-8
 """
-torrentinfo.py - Sopel module to fetch torrent information for links sent to channels
+torrentinfo - Sopel plugin to fetch info for torrent links
 """
 
 import re
 
 import bleach
-import requests
 from lxml import etree
+import requests
 
-from sopel import module, web
+from sopel import plugin
+from sopel.tools import web
 
 
 NYAA_URL = 'https://nyaa.si/view/%s'
 ANIDEX_URL = 'https://anidex.info/torrent/%s'
 
 
-@module.url(r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)')
+@plugin.url(r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)')
 def nyaa_info(bot, trigger, match=None):
     parsed_url = NYAA_URL % match.group(1)
     try:
@@ -46,7 +47,7 @@ def nyaa_info(bot, trigger, match=None):
     bot.say("[Nyaa] Name: {name} | {category} | Size: {size} | {uploader}".format(**t))
 
 
-@module.url(r'https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+)')
+@plugin.url(r'https?:\/\/(?:www\.)?anidex\.(?:info|moe)\/(?:torrent|dl)\/(\d+)')
 def anidex_info(bot, trigger, match=None):
     parsed_url = ANIDEX_URL % match.group(1)
     try:
