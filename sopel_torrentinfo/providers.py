@@ -3,9 +3,48 @@
 
 
 import abc
+from collections import OrderedDict
 import re
 
 from lxml import etree
+
+
+class ProviderManager:
+    """Manager of info providers. Possibly also slayer of dragons."""
+
+    def __init__(self):
+        self.providers = OrderedDict()
+        """Mapping of each known provider's URL pattern to an instance of that provider."""
+        # TODO: Can be a regular dict in py3.7+ only;
+        # dict remembering insertion order is guaranteed as of py3.7
+
+    def register_provider(self, provider):
+        """Make the manager aware of ``provider`` and its URL pattern."""
+        if not isinstance(provider, TorrentInfoProvider):
+            try:
+                provider = provider()
+            except Exception:
+                # doesn't matter what happened; bail if something's fucky
+                raise ValueError("Not a TorrentInfoProvider subclass: %s" % provider)
+
+        self.providers[provider.get_url_pattern()] = provider
+
+    def remove_provider(self, provider):
+        """Forget about ``provider`` and its URL pattern."""
+        try:
+            del self.providers[provider.get_url_pattern()]
+        except KeyError:
+            raise RuntimeError('Attempt to remove a provider that was not registered.')
+
+    def map_url_to_provider(self, url):
+        """Given ``url``, return an instance of the best-matching provider."""
+        for pattern, provider in self.providers.items():
+            if pattern.match(url):
+                return provider
+
+        # no matching provider
+        # explicit better than implicit
+        return None
 
 
 class TorrentInfoProvider(abc.ABC):

@@ -7,32 +7,32 @@ import pkg_resources
 
 import requests
 
-from sopel import plugin, tools
+from sopel import plugin
+
+from .providers import ProviderManager
+
+
+provider_manager = ProviderManager()
 
 
 def setup(bot):
-    global patterns
-
-    bot.memory['torrentinfo_providers'] = tools.SopelMemory()
-
     entry_points = pkg_resources.iter_entry_points('sopel_torrentinfo.providers')
-    patterns = []
 
     for entry_point in entry_points:
         provider = entry_point.load()
-        bot.memory['torrentinfo_providers'][entry_point.name] = provider = provider()
-        patterns.append(provider.get_url_pattern())
+        provider_manager.register_provider(provider)
 
 
 def lazy_handlers(settings):
-    return patterns
+    return provider_manager.providers.keys()
 
 
 @plugin.url_lazy(lazy_handlers)
 def torrent_info(bot, trigger):
-    for name, provider in bot.memory['torrentinfo_providers'].items():
-        if provider.get_url_pattern().match(trigger.group(0)):
-            break
+    provider = provider_manager.map_url_to_provider(trigger.group(0))
+
+    if provider is None:
+        raise RuntimeError("It shouldn't be possible to get here.")
 
     display_name = provider.DISPLAY_NAME
     fetch_url = provider.get_fetch_url(trigger)
