@@ -111,6 +111,5 @@ class Nyaa(TorrentInfoProvider):
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 1)[0])
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 2)[1])
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2])
-        t.append(response.url)
 
         return t
