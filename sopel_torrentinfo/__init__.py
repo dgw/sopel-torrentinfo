@@ -3,40 +3,51 @@
 torrentinfo - Sopel plugin to fetch info for torrent links
 """
 
-from lxml import etree
+import pkg_resources
+
 import requests
 
 from sopel import plugin
 
+from .providers import ProviderManager
 
-NYAA_URL = 'https://nyaa.si/view/%s'
+
+provider_manager = ProviderManager()
 
 
-@plugin.url(r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)')
-def nyaa_info(bot, trigger, match=None):
-    parsed_url = NYAA_URL % match.group(1)
+def setup(bot):
+    entry_points = pkg_resources.iter_entry_points('sopel_torrentinfo.providers')
+
+    for entry_point in entry_points:
+        provider = entry_point.load()
+        provider_manager.register_provider(provider)
+
+
+def lazy_handlers(settings):
+    return provider_manager.providers.keys()
+
+
+@plugin.url_lazy(lazy_handlers)
+def torrent_info(bot, trigger):
+    provider = provider_manager.map_url_to_provider(trigger.group(0))
+
+    if provider is None:
+        raise RuntimeError("It shouldn't be possible to get here.")
+
+    display_name = provider.DISPLAY_NAME
+    fetch_url = provider.get_fetch_url(trigger)
+
     try:
-        r = requests.get(url=parsed_url, timeout=(10.0, 4.0))
+        r = requests.get(url=fetch_url, timeout=(10.0, 4.0))
     except requests.exceptions.ConnectTimeout:
-        return bot.say("[Nyaa] Connection timed out.")
+        return bot.say("[{}] Connection timed out.".format(display_name))
     except requests.exceptions.ConnectionError:
-        return bot.say("[Nyaa] Couldn't connect to server.")
+        return bot.say("[{}] Couldn't connect to server.".format(display_name))
     except requests.exceptions.ReadTimeout:
-        return bot.say("[Nyaa] Server took too long to send data.")
+        return bot.say("[{}] Server took too long to send data.".format(display_name))
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        return bot.say("[Nyaa] HTTP error: " + str(e))
+        return bot.say("[{}] HTTP error: ".format(display_name) + str(e))
 
-    page = etree.HTML(r.content)
-
-    t = {}
-
-    t['name'] = page.cssselect('meta[property="og:title"]')[0].get('content').replace(' :: Nyaa', '')
-    t['category'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 1)[0]
-    t['size'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 2)[1]
-    t['uploader'] = page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2]
-    t['link'] = parsed_url
-    for key in t.keys():
-        t[key] = (' '.join(t[key].split()))
-    bot.say("[Nyaa] Name: {name} | {category} | Size: {size} | {uploader}".format(**t))
+    bot.say("[{}] ".format(display_name) + ' | '.join([s.strip() for s in provider.parse(r)]))
