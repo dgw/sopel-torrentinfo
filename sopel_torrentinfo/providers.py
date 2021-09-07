@@ -113,3 +113,32 @@ class Nyaa(TorrentInfoProvider):
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2])
 
         return t
+
+
+class TokyoTosho(TorrentInfoProvider):
+    """Handler for TokyoTosho links."""
+
+    URL_PATTERN = r'https?:\/\/(?:www\.)?tokyotosho\.info\/details\.php\?id=(\d+)'
+
+    def get_fetch_url(self, trigger):
+        return 'https://www.tokyotosho.info/details.php?id=%s' % trigger.group(1)
+
+    def parse(self, response):
+        details = etree.HTML(response.content).cssselect('div.details')[0]
+        items = []
+
+        # title
+        items.append(details.xpath('//a[@type="application/x-bittorrent"]/text()[normalize-space()]')[0])
+        # category
+        items.append(details.xpath('//li[contains(text(), "Torrent Type")]/following::li[1]/a/text()')[0])
+        # size
+        items.append(details.xpath('//li[contains(text(), "Filesize")]/following::li[1]/text()')[0])
+        # submitter and timestamp
+        items.append("Submitted by {} at {}".format(
+            # user
+            details.xpath('//li/em[contains(text(), "Submitter")]/following::li[1]/text()')[0].rstrip(),
+            # timestamp
+            details.xpath('//li[contains(text(), "Date Submitted")]/following::li[1]/text()')[0]
+        ))
+
+        return items
