@@ -50,4 +50,12 @@ def torrent_info(bot, trigger):
     except requests.exceptions.HTTPError as e:
         return bot.say("[{}] HTTP error: ".format(display_name) + str(e))
 
-    bot.say("[{}] ".format(display_name) + ' | '.join([s.strip() for s in provider.parse(r)]))
+    bot.say(
+        "[{}] ".format(display_name) + (
+            ' | '.join([
+                s.strip()
+                for s
+                in provider.parse(r, trigger)
+            ])
+        )
+    )

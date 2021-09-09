@@ -74,7 +74,7 @@ class TorrentInfoProvider(abc.ABC):
         """Return the URL to fetch, given a matching URL ``trigger``."""
 
     @abc.abstractmethod
-    def parse(response):
+    def parse(self, response, trigger):
         """Parse the fetched ``response`` data.
 
         The ``response`` is a ``requests.Response`` object, just as if the
@@ -97,12 +97,12 @@ class TorrentInfoProvider(abc.ABC):
 class Nyaa(TorrentInfoProvider):
     """Handler for Nyaa.si links."""
 
-    URL_PATTERN = r'https?:\/\/(?:www\.)?nyaa\.si\/(?:view|download)\/(\d+)'
+    URL_PATTERN = r'https?:\/\/(?:www\.)?nyaa\.si\/(view|download)\/(\d+)'
 
     def get_fetch_url(self, trigger):
-        return 'https://nyaa.si/view/%s' % trigger.group(1)
+        return 'https://nyaa.si/view/%s' % trigger.group(2)
 
-    def parse(self, response):
+    def parse(self, response, trigger):
         page = etree.HTML(response.content)
 
         t = []
@@ -111,6 +111,8 @@ class Nyaa(TorrentInfoProvider):
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 1)[0])
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 2)[1])
         t.append(page.cssselect('meta[property="og:description"]')[0].get('content').split("|", 3)[2])
+        if trigger.group(1) != 'view':
+            t.append(self.get_fetch_url(trigger))
 
         return t
 
@@ -123,7 +125,7 @@ class TokyoTosho(TorrentInfoProvider):
     def get_fetch_url(self, trigger):
         return 'https://www.tokyotosho.info/details.php?id=%s' % trigger.group(1)
 
-    def parse(self, response):
+    def parse(self, response, trigger):
         details = etree.HTML(response.content).cssselect('div.details')[0]
         items = []
 
